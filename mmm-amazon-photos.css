@@ -1,0 +1,12 @@
+.mmm-amazon-photos .images,
+.mmm-amazon-photos .image,
+.mmm-amazon-photos .gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.mmm-amazon-photos .image {
+  background-repeat: no-repeat;
+}

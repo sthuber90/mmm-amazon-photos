@@ -1,0 +1,48 @@
+html {
+  width: 100vw;
+  height: 100vh;
+}
+
+body {
+  margin: 20px;
+  height: calc(100% - 40px);
+  width: calc(100% - 40px);
+  background: #000;
+  color: #fff;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}
+
+header {
+  border-bottom: 1px solid #eee;
+  color: #fff;
+}
+
+/**
+ * Default styles.
+ */
+
+.dimmed {
+  color: #fff;
+}
+
+.normal {
+  color: #fff;
+}
+
+.bright {
+  color: #fff;
+}
+
+.region.bottom.left,
+.region.bottom.right {
+  max-width: 50vw;
+}
+
+.calendar .title {
+  text-align: left;
+}
+
+.calendar .time {
+  /* align time */
+  width: 43px;
+}
