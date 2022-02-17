@@ -128,14 +128,22 @@ Module.register('mmm-amazon-photos', {
       this.config.gradientDirection === 'vertical' ||
       this.config.gradientDirection === 'both'
     ) {
-      this.createGradientDiv('bottom', this.config.gradient, wrapper)
+      const gradientBottom = this.createGradientDiv(
+        'bottom',
+        this.config.gradient
+      )
+      wrapper.appendChild(gradientBottom)
     }
 
     if (
       this.config.gradientDirection === 'horizontal' ||
       this.config.gradientDirection === 'both'
     ) {
-      this.createGradientDiv('right', this.config.gradient, wrapper)
+      const gradientRight = this.createGradientDiv(
+        'right',
+        this.config.gradient
+      )
+      wrapper.appendChild(gradientRight)
     }
 
     if (this.config.imageUrls.length === 0) {
@@ -149,7 +157,7 @@ Module.register('mmm-amazon-photos', {
     return wrapper
   },
 
-  createGradientDiv: function (direction, gradient, wrapper) {
+  createGradientDiv: function (direction, gradient) {
     const div = document.createElement('div')
     div.style.backgroundImage =
       'linear-gradient( to ' + direction + ', ' + gradient.join() + ')'
@@ -172,7 +180,7 @@ Module.register('mmm-amazon-photos', {
           )
         })
       : undefined
-    wrapper.appendChild(div)
+    return div
   },
 
   createDiv: function () {
@@ -225,14 +233,14 @@ Module.register('mmm-amazon-photos', {
     this.suspend()
     const self = this
     this.timer = setInterval(function () {
-      Log.info(`${this.name} updating from resume`)
+      Log.info(`${self.name}: updating from resume`)
       self.retrieveImage()
     }, self.config.slideshowSpeed)
   },
 
   retrieveImage: function () {
     this.suspend()
-    Log.info('Getting Image')
+    Log.info('mmm-amazon-photos: Getting Image')
     // ask helper function to get the image list
     this.sendSocketNotification('AMAZONPHOTOS_REGISTER_CONFIG', this.config)
   },

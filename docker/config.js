@@ -32,7 +32,9 @@ let config = {
       module: 'mmm-amazon-photos',
       position: 'fullscreen_below',
       config: {
-        imageUrls: ['https://www.amazon.com/clouddrive/share/the-share-id'],
+        imageUrls: [
+          'https://www.amazon.de/clouddrive/share/m0qXS7AVB49zDMqTP6XPklJ6ZPpN1TG5plMhRFWMKc5',
+        ],
         slideshowSpeed: 5000,
       },
     },

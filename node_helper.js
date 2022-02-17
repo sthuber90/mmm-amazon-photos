@@ -1,4 +1,4 @@
-/* node_helper.js
+/*
  *
  * Magic Mirror
  * Module: mmm-amazon-photos
@@ -11,6 +11,10 @@
  */
 
 // call in the required classes
+/**
+ * @external node_helper
+ * @see https://github.com/MichMich/MagicMirror/blob/master/js/node_helper.js
+ */
 const NodeHelper = require('node_helper')
 const Fs = require('fs')
 const Path = require('path')
@@ -19,8 +23,6 @@ const regex = /(.*)\/.*\/share\/(.*)/gm
 
 // the main module helper create
 module.exports = NodeHelper.create({
-  start: function () {},
-
   // get the next image
   getImage: async function (config) {
     // get next image from random URL

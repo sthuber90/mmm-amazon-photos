@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mmm-amazon-photos should create div 1`] = `
+<div
+  class="image"
+  style="background-size: cover; background-position: center;"
+/>
+`;
+
+exports[`mmm-amazon-photos should create gradient div 1`] = `
+<div
+  class="gradient"
+/>
+`;
+
+exports[`mmm-amazon-photos should create gradient div without click listener 1`] = `
+<div
+  class="gradient"
+/>
+`;
+
+exports[`mmm-amazon-photos should get DOM 1`] = `
+<div>
+  <div
+    class="images"
+  />
+  <div
+    class="gradient"
+  />
+</div>
+`;
+
+exports[`mmm-amazon-photos should get DOM 2`] = `
+<div>
+  <div
+    class="images"
+  />
+  <div
+    class="gradient"
+  />
+</div>
+`;
+
+exports[`mmm-amazon-photos should have correct defaults 1`] = `
+Object {
+  "backgroundPosition": "center",
+  "backgroundSize": "cover",
+  "focus": true,
+  "gradient": Array [
+    "rgba(0, 0, 0, 0.75) 0%",
+    "rgba(0, 0, 0, 0) 40%",
+    "rgba(0, 0, 0, 0) 80%",
+    "rgba(0, 0, 0, 0.75) 100%",
+  ],
+  "gradientDirection": "vertical",
+  "imageUrls": Array [
+    "https://www.amazon.com/clouddrive/share/placeholderShareId",
+  ],
+  "slideshowSpeed": 3600000,
+}
+`;

@@ -82,7 +82,7 @@ It's also possible to share only certain pictures from an album or from Amazon D
 
 ## Testing
 
-Automated tests are planned but currently hard to implement. However, if you have Docker installed locally, you can run `npm run test:docker`. This will run [karsten13/magicmirror](https://karsten13.de/magicmirror/) and make MagicMirror² with the Amazon Photos module accessible on _http://localhost:8080_
+Automated tests are planned but currently hard to implement. However, if you have Docker installed locally, you can run `npm run start`. This will run [karsten13/magicmirror](https://karsten13.de/magicmirror/) and make MagicMirror² with the Amazon Photos module accessible on _http://localhost:8080_
 
 ## Contribution
 
