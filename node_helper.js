@@ -49,12 +49,12 @@ module.exports = NodeHelper.create({
         `${baseUrl}/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&tempLink=true&shareId=${shareId}&offset=0&resourceVersion=V2&ContentType=JSON`
       )
 
-      let url = `${baseUrl}/drive/v1/nodes/${intermediateRes.data.data[0].id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=['contentProperties.contentDate ASC']&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
+      let url = `${baseUrl}/drive/v1/nodes/${intermediateRes.data.data[0].id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
       if (
         'kind' in intermediateRes.data.data[0] &&
         intermediateRes.data.data[0].kind === 'FILE'
       ) {
-        url = `${baseUrl}/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=['contentProperties.contentDate ASC']&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
+        url = `${baseUrl}/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
       }
       if (Object.prototype.hasOwnProperty.call(cachedNextTokens, shareId)) {
         url = url.concat(`&offset=${cachedNextTokens[shareId]}`)
