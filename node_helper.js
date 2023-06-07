@@ -30,8 +30,6 @@ module.exports = NodeHelper.create({
     const path = Path.resolve(__dirname, "images", "code.jpg")
     const jsonPath = Path.resolve(__dirname, "images", "cache.json")
     // create an empty main image list
-    let imageList = []
-
     const cachedNextTokens = Fs.existsSync(jsonPath) ? JSON.parse(Fs.readFileSync(jsonPath, "utf8")) : {}
 
     const res = await Axios.get(
@@ -69,21 +67,14 @@ module.exports = NodeHelper.create({
     }
     Fs.writeFileSync(jsonPath, JSON.stringify(cachedNextTokens, null, 2))
 
-    imageList.push({ path: path })
-    // imageList.push({ path: response.data.data[0].tempLink });
-    // console.log(await Axios.get(response.data.data[0].tempLink))
-    // console.log(await this.downloadImage(response.data.data[0].tempLink));
-    // imageList = config.randomizeImageOrder
-    // ? this.shuffleArray(imageList)
-    // : this.sortImageList(imageList, config.sortImagesBy, config.sortImagesDescending);
-
     // build the return payload
     const returnPayload = {
       identifier: config.identifier,
-      imageList: imageList.map((item) => `modules/mmm-amazon-photos/images/code.jpg?offset=${cachedNextTokens[shareId]}`), // map the array to only extract the paths
+      imageSource: `modules/mmm-amazon-photos/images/code.jpg?offset=${cachedNextTokens[shareId]}`,
     }
     // send the image list back
     this.sendSocketNotification("AMAZONPHOTOS_FILELIST", returnPayload)
+    return
   },
 
   downloadImage: async function downloadImage(url, path) {
@@ -105,7 +96,6 @@ module.exports = NodeHelper.create({
 
   // subclass socketNotificationReceived, received notification from module
   socketNotificationReceived: function (notification, payload) {
-    // console.log(notification);
     if (notification === "AMAZONPHOTOS_REGISTER_CONFIG") {
       const config = payload
 
@@ -122,7 +112,7 @@ module.exports = NodeHelper.create({
           console.info("Return cached image")
           const returnPayload = {
             identifier: config.identifier,
-            imageList: [`modules/mmm-amazon-photos/images/code.jpg?cached=true`], // map the array to only extract the paths
+            imageSource: `modules/mmm-amazon-photos/images/code.jpg?cached=true`, 
           }
           // send the image list back
           this.sendSocketNotification("AMAZONPHOTOS_FILELIST", returnPayload)

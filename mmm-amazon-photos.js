@@ -91,9 +91,6 @@ Module.register('mmm-amazon-photos', {
     this.config.validImageFileExtensions = this.config.validImageFileExtensions.toLowerCase();
     // ensure image order is in lower case
     this.config.sortImagesBy = this.config.sortImagesBy.toLowerCase();
-    // commented out since this was not doing anything
-    // set no error
-    // this.errorMessage = null;
 
     //validate imageinfo property.  This will make sure we have at least 1 valid value
     const imageInfoRegex = /\bname\b|\bdate\b/gi;
@@ -137,87 +134,14 @@ Module.register('mmm-amazon-photos', {
   notificationReceived: function (notification, payload, sender) {
     if (sender) {
       Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
-      if (notification === 'AMAZONPHOTOS_IMAGE_UPDATE') {
-        Log.log('mmm-amazon-photos: Changing Background');
-        this.suspend();
-        this.updateImage();
-        this.resume();
-      } else if (notification === 'AMAZONPHOTOS_NEXT') {
-        // Change to next image
-        this.updateImage();
-        if (this.timer) {
-          // Restart timer only if timer was already running
-          this.resume();
-        }
-      } else if (notification === 'AMAZONPHOTOS_PREVIOUS') {
-        // Change to previous image
-        this.updateImage(/* skipToPrevious= */ true);
-        if (this.timer) {
-          // Restart timer only if timer was already running
-          this.resume();
-        }
-      } else if (notification === 'AMAZONPHOTOS_PLAY') {
-        // Change to next image and start timer.
-        this.updateImage();
-        this.resume();
-      } else if (notification === 'AMAZONPHOTOS_PAUSE') {
-        // Stop timer.
-        this.suspend();
-      } else if (notification === 'AMAZONPHOTOS_URL') {
-        if (payload && payload.url) {
-          // Stop timer.
-          if (payload.resume) {
-            if (this.timer) {
-              // Restart timer only if timer was already running
-              this.resume();
-            }
-          } else {
-            this.suspend();
-          }
-          this.updateImage(false, payload.url);
-        }
-      } else if (notification === 'AMAZONPHOTOS_URLS') {
-        // console.log(`Notification Recieved: AMAZONPHOTOS_URLS. Payload: ${JSON.stringify(payload)}`);
-        if (payload && payload.urls && payload.urls.length) {
-          // check if image list has been saved. If not, this is the first time the notification is received
-          // save the image list and index.
-          if (!this.savedImages) {
-            this.savedImages = this.imageList;
-            this.savedIndex = this.imageIndex;
-            this.updateImageListWithArray(payload.urls);
-          } else {
-            // check if there the sent urls are the same, or different.
-            let temp = _.union(payload.urls, this.imageList);
-            // if they are the same length, then they haven't changed, so don't do anything.
-            if (temp.length !== payload.urls.length) {
-              this.updateImageListWithArray(payload.urls);
-            }
-          }
-          // no urls sent, see if there is saved data.
-        } else if (this.savedImages) {
-          this.imageList = this.savedImages;
-          this.imageIndex = this.savedIndex;
-          this.savedImages = null;
-          this.savedIndex = null;
-          this.updateImage();
-          if (this.timer) {
-            // Restart timer only if timer was already running
-            this.resume();
-          }
-        }
-      } else {
-        // Log.log(this.name + " received a system notification: " + notification);
-      }
-    }
-  },
-
-  updateImageListWithArray: function (urls) {
-    this.imageList = urls;
-    this.imageIndex = 0;
-    this.updateImage();
-    if (this.timer || (this.savedImages && this.savedImages.length == 0)) {
-      // Restart timer only if timer was already running
-      this.resume();
+      // if (notification === 'AMAZONPHOTOS_IMAGE_UPDATE') {
+      //   Log.log('mmm-amazon-photos: Changing Background');
+      //   this.suspend();
+      //   this.updateImage();
+      //   this.resume();
+      // } else {
+      //   // Log.log(this.name + " received a system notification: " + notification);
+      // }
     }
   },
 
@@ -231,13 +155,13 @@ Module.register('mmm-amazon-photos', {
         // console.info('Returning Images, payload:' + JSON.stringify(payload));
         // set the image list
         if (this.savedImages) {
-          this.savedImages = payload.imageList;
+          this.savedImages = payload.imageSource;
           this.savedIndex = 0;
         } else {
-          this.imageList = payload.imageList;
+          this.imageSource = payload.imageSource;
           // if image list actually contains images
           // set loaded flag to true and update dom
-          if (this.imageList.length > 0) {
+          if (this.imageSource) {
             this.updateImage(); //Added to show the image at least once, but not change it within this.resume()
             this.resume();
           }
@@ -273,9 +197,9 @@ Module.register('mmm-amazon-photos', {
       // Log.error('mmm-amazon-photos: Missing required parameter imagePaths.');
     } else {
       // create an empty image list
-      this.imageList = [];
+      this.imageSource = null;
       // set beginning image index to 0, as it will auto increment on start
-      this.imageIndex = 0;
+      // this.imageIndex = 0;
       this.updateImageList();
     }
 
@@ -330,30 +254,20 @@ Module.register('mmm-amazon-photos', {
   },
 
   updateImage: function (backToPreviousImage = false, imageToDisplay = null) {
-    if (!imageToDisplay) {
-      if (!this.imageList || !this.imageList.length) {
-        return;
-      }
-      if (backToPreviousImage) {
-        // imageIndex is incremented after displaying an image so -2 is needed to
-        // get to previous image index.
-        this.imageIndex -= 2;
+    // if (!imageToDisplay) {
+    //   if (!this.imageSource || !this.imageSource.length) {
+    //     return;
+    //   }
 
-        // Case of first image, go to end of array.
-        if (this.imageIndex < 0) {
-          this.imageIndex = 0;
-        }
-      }
-
-      if (this.imageIndex >= this.imageList.length) {
-        this.imageIndex = 0;
-        // only update the image list if one wasn't sent through notifications
-        if (!this.savedImages) {
-          this.updateImageList();
-          return;
-        }
-      }
-    }
+    //   if (this.imageIndex >= this.imageSource.length) {
+    //     this.imageIndex = 0;
+    //     // only update the image list if one wasn't sent through notifications
+    //     if (!this.savedImages) {
+    //       this.updateImageList();
+    //       return;
+    //     }
+    //   }
+    // }
 
     const image = new Image();
     const that = this
@@ -452,38 +366,35 @@ Module.register('mmm-amazon-photos', {
       transitionDiv.appendChild(imageDiv);
       that.imagesDiv.appendChild(transitionDiv);
     };
-    if (imageToDisplay) {
-      image.src = encodeURI(imageToDisplay);
-    } else {
-      image.src = encodeURI(this.imageList[this.imageIndex]);
-      this.imageIndex += 1;
-    }
+    console.info(`this.imageSource ${this.imageSource}`)
+    image.src = encodeURI(this.imageSource);
+    // this.imageIndex += 1;
 
     this.sendNotification('AMAZONPHOTOS_IMAGE_UPDATED', { url: image.src });
-    // console.info('Updating image, source:' + image.src);
+    console.info('Updating image, source:' + image.src);
   },
 
-  getImageTransformCss: function (exifOrientation) {
-    switch (exifOrientation) {
-      case 2:
-        return 'scaleX(-1)';
-      case 3:
-        return 'scaleX(-1) scaleY(-1)';
-      case 4:
-        return 'scaleY(-1)';
-      case 5:
-        return 'scaleX(-1) rotate(90deg)';
-      case 6:
-        return 'rotate(90deg)';
-      case 7:
-        return 'scaleX(-1) rotate(-90deg)';
-      case 8:
-        return 'rotate(-90deg)';
-      case 1: // Falls through.
-      default:
-        return 'rotate(0deg)';
-    }
-  },
+  // getImageTransformCss: function (exifOrientation) {
+  //   switch (exifOrientation) {
+  //     case 2:
+  //       return 'scaleX(-1)';
+  //     case 3:
+  //       return 'scaleX(-1) scaleY(-1)';
+  //     case 4:
+  //       return 'scaleY(-1)';
+  //     case 5:
+  //       return 'scaleX(-1) rotate(90deg)';
+  //     case 6:
+  //       return 'rotate(90deg)';
+  //     case 7:
+  //       return 'scaleX(-1) rotate(-90deg)';
+  //     case 8:
+  //       return 'rotate(-90deg)';
+  //     case 1: // Falls through.
+  //     default:
+  //       return 'rotate(0deg)';
+  //   }
+  // },
 
   updateImageInfo: function (imageSrc, imageDate) {
     let imageProps = [];
@@ -515,9 +426,9 @@ Module.register('mmm-amazon-photos', {
           }
           imageProps.push(imageName);
           break;
-        case 'imagecount':
-          imageProps.push(`${this.imageIndex} of ${this.imageList.length}`);
-          break;
+        // case 'imagecount':
+        //   imageProps.push(`${this.imageIndex} of ${this.imageList.length}`);
+        //   break;
         default:
           Log.warn(prop + ' is not a valid value for imageInfo.  Please check your configuration');
       }
