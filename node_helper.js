@@ -70,7 +70,7 @@ module.exports = NodeHelper.create({
     // build the return payload
     const returnPayload = {
       identifier: config.identifier,
-      imageSource: `modules/mmm-amazon-photos/images/code.jpg?offset=${cachedNextTokens[shareId]}`,
+      imageSource: `modules/mmm-amazon-photos/images/code.jpg?shareId=${shareId}&offset=${cachedNextTokens[shareId]}`,
     }
     // send the image list back
     this.sendSocketNotification("AMAZONPHOTOS_FILELIST", returnPayload)
