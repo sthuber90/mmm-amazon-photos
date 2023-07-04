@@ -29,49 +29,60 @@ module.exports = NodeHelper.create({
     const shareId = imageUrl.split("share/")[1]
     const path = Path.resolve(__dirname, "images", "code.jpg")
     const jsonPath = Path.resolve(__dirname, "images", "cache.json")
-    // create an empty main image list
-    const cachedNextTokens = Fs.existsSync(jsonPath) ? JSON.parse(Fs.readFileSync(jsonPath, "utf8")) : {}
+    let returnPayload
 
-    const res = await Axios.get(
-      `https://www.amazon.de/drive/v1/shares/${shareId}?shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
-    )
-    console.log(`Get picture from ${res.data.nodeInfo.name}`)
-    const intermediateRes = await Axios.get(
-      `https://www.amazon.de/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&tempLink=true&shareId=${shareId}&offset=0&resourceVersion=V2&ContentType=JSON`
-    )
+    try {
+      // create an empty main image list
+      const cachedNextTokens = Fs.existsSync(jsonPath) ? JSON.parse(Fs.readFileSync(jsonPath, "utf8")) : {}
 
-    let url = `https://www.amazon.de/drive/v1/nodes/${intermediateRes.data.data[0].id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
-    if ("kind" in intermediateRes.data.data[0] && intermediateRes.data.data[0].kind === "FILE") {
-      url = `https://www.amazon.de/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
-    }
-    if (Object.prototype.hasOwnProperty.call(cachedNextTokens, shareId)) {
-      url = url.concat(`&offset=${cachedNextTokens[shareId]}`)
-    }
-    const response = await Axios.get(url)
-    const amazonPhotosData = response.data
-    if ("data" in amazonPhotosData && amazonPhotosData.data.length > 0 && "tempLink" in amazonPhotosData.data[0]) {
-      await this.downloadImage(amazonPhotosData.data[0].tempLink, path)
+      const res = await Axios.get(
+        `https://www.amazon.de/drive/v1/shares/${shareId}?shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
+      )
+      console.log(`Get picture from ${res.data.nodeInfo.name}`)
+      const intermediateRes = await Axios.get(
+        `https://www.amazon.de/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&tempLink=true&shareId=${shareId}&offset=0&resourceVersion=V2&ContentType=JSON`
+      )
 
-      if (amazonPhotosData.count === cachedNextTokens[shareId] - 1) {
-        cachedNextTokens[shareId] = 0
-      } else {
-        cachedNextTokens[shareId] = cachedNextTokens[shareId] + 1
+      let url = `https://www.amazon.de/drive/v1/nodes/${intermediateRes.data.data[0].id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
+      if ("kind" in intermediateRes.data.data[0] && intermediateRes.data.data[0].kind === "FILE") {
+        url = `https://www.amazon.de/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
       }
-    } else {
-      console.log(`Could not get image from url: ${url} with response ${JSON.stringify(amazonPhotosData, null, 2)}`)
-      cachedNextTokens[shareId] = 0
-    }
+      if (Object.prototype.hasOwnProperty.call(cachedNextTokens, shareId)) {
+        url = url.concat(`&offset=${cachedNextTokens[shareId]}`)
+      }
+      const response = await Axios.get(url)
+      const amazonPhotosData = response.data
+      if ("data" in amazonPhotosData && amazonPhotosData.data.length > 0 && "tempLink" in amazonPhotosData.data[0]) {
+        await this.downloadImage(amazonPhotosData.data[0].tempLink, path)
 
-    if (isNaN(cachedNextTokens[shareId])) {
-      cachedNextTokens[shareId] = 1
-    }
-    Fs.writeFileSync(jsonPath, JSON.stringify(cachedNextTokens, null, 2))
+        if (amazonPhotosData.count === cachedNextTokens[shareId] - 1) {
+          cachedNextTokens[shareId] = 0
+        } else {
+          cachedNextTokens[shareId] = cachedNextTokens[shareId] + 1
+        }
+      } else {
+        console.log(`Could not get image from url: ${url} with response ${JSON.stringify(amazonPhotosData, null, 2)}`)
+        cachedNextTokens[shareId] = 0
+      }
 
-    // build the return payload
-    const returnPayload = {
+      if (isNaN(cachedNextTokens[shareId])) {
+        cachedNextTokens[shareId] = 1
+      }
+      Fs.writeFileSync(jsonPath, JSON.stringify(cachedNextTokens, null, 2))
+
+      // build the return payload
+      returnPayload = {
+        identifier: config.identifier,
+        imageSource: `modules/mmm-amazon-photos/images/code.jpg?shareId=${shareId}&offset=${cachedNextTokens[shareId]}`,
+      } 
+  } catch(err) {
+    console.error(err)
+    // in case of an error, return the already downloaded image and try again in the next iteration
+    returnPayload = {
       identifier: config.identifier,
-      imageSource: `modules/mmm-amazon-photos/images/code.jpg?shareId=${shareId}&offset=${cachedNextTokens[shareId]}`,
+      imageSource: 'modules/mmm-amazon-photos/images/code.jpg',
     }
+  }
     // send the image list back
     this.sendSocketNotification("AMAZONPHOTOS_FILELIST", returnPayload)
     return

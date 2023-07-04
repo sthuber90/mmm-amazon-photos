@@ -196,8 +196,8 @@ Module.register('mmm-amazon-photos', {
     if (this.config.imagePaths.length == 0) {
       // Log.error('mmm-amazon-photos: Missing required parameter imagePaths.');
     } else {
-      // create an empty image list
-      this.imageSource = null;
+      // create image source and load cached image if it exists
+      this.imageSource = `${location.origin}/modules/mmm-amazon-photos/images/code.jpg`;
       // set beginning image index to 0, as it will auto increment on start
       // this.imageIndex = 0;
       this.updateImageList();
