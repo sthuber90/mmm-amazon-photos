@@ -27,7 +27,7 @@ module.exports = NodeHelper.create({
   // gathers the image list
   gatherImageList: async function (config) {
     const imageUrl = new URL(
-      config.imagePaths[Math.floor(Math.random() * config.imagePaths.length)]
+      config.imageUrls[Math.floor(Math.random() * config.imageUrls.length)]
     )
     const origin = imageUrl.origin
     const shareId = imageUrl.pathname.split('share/')[1]
