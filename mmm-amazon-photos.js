@@ -38,18 +38,12 @@ Module.register('mmm-amazon-photos', {
     imageInfo: 'name, date, imagecount',
     // location of the info div
     imageInfoLocation: 'bottomRight', // Other possibilities are: bottomLeft, topLeft, topRight
-    // transition speed from one image to the other, transitionImages must be true
-    transitionSpeed: '2s',
-    // show a progress bar indicating how long till the next image is displayed.
-    showProgressBar: false,
     // the sizing of the background image
     // cover: Resize the background image to cover the entire container, even if it has to stretch the image or cut a little bit off one of the edges
     // contain: Resize the background image to make sure the image is fully visible
     backgroundSize: 'cover', // cover or contain
     // if backgroundSize contain, determine where to zoom the picture. Towards top, center or bottom
     backgroundPosition: 'center', // Most useful options: "top" or "center" or "bottom"
-    // transition from one image to the other (may be a bit choppy on slower devices, or if the images are too big)
-    transitionImages: false,
     // the gradient to make the text more visible
     gradient: [
       'rgba(0, 0, 0, 0.75) 0%',
@@ -65,32 +59,6 @@ Module.register('mmm-amazon-photos', {
     ],
     // the direction the gradient goes, vertical or horizontal
     gradientDirection: 'vertical',
-    // Whether to scroll larger pictures rather than cut them off
-    backgroundAnimationEnabled: false,
-    // How long the scrolling animation should take - if this is more than slideshowSpeed, then images do not scroll fully.
-    // If it is too fast, then the image may apear gittery. For best result, by default we match this to slideshowSpeed.
-    // For now, it is not documented and will default to match slideshowSpeed.
-    backgroundAnimationDuration: '1s',
-    // How many times to loop the scrolling back and forth.  If the value is set to anything other than infinite, the
-    // scrolling will stop at some point since we reuse the same div1.
-    // For now, it is not documentd and is defaulted to infinite.
-    backgroundAnimationLoopCount: 'infinite',
-    // Transitions to use
-    transitions: [
-      'opacity',
-      'slideFromRight',
-      'slideFromLeft',
-      'slideFromTop',
-      'slideFromBottom',
-      'slideFromTopLeft',
-      'slideFromTopRight',
-      'slideFromBottomLeft',
-      'slideFromBottomRight',
-      'flipX',
-      'flipY',
-    ],
-    transitionTimingFunction: 'cubic-bezier(.17,.67,.35,.96)',
-    animations: ['slide', 'zoomOut', 'zoomIn'],
   },
 
   // load function
@@ -125,17 +93,6 @@ Module.register('mmm-amazon-photos', {
       this.config.imageInfo = this.config.imageInfo.filter(function (n) {
         return n
       })
-    }
-
-    if (!this.config.transitionImages) {
-      this.config.transitionSpeed = '0'
-    }
-
-    // Lets make sure the backgroundAnimation duration matches the slideShowSpeed unless it has been
-    // overriden
-    if (this.config.backgroundAnimationDuration === '1s') {
-      this.config.backgroundAnimationDuration =
-        this.config.slideshowSpeed / 1000 + 's'
     }
 
     // Chrome versions < 81 do not support EXIF orientation natively. A CSS transformation
@@ -228,10 +185,6 @@ Module.register('mmm-amazon-photos', {
       this.imageInfoDiv = this.createImageInfoDiv(wrapper)
     }
 
-    if (this.config.showProgressBar) {
-      this.createProgressbarDiv(wrapper, this.config.slideshowSpeed)
-    }
-
     if (this.config.imageUrl.length == 0) {
       // Log.error('mmm-amazon-photos: Missing required parameter imageUrl.');
     } else {
@@ -284,17 +237,6 @@ Module.register('mmm-amazon-photos', {
     return div
   },
 
-  createProgressbarDiv: function (wrapper, slideshowSpeed) {
-    const div = document.createElement('div')
-    div.className = 'progress'
-    const inner = document.createElement('div')
-    inner.className = 'progress-inner'
-    inner.style.display = 'none'
-    inner.style.animation = `move ${slideshowSpeed}ms linear`
-    div.appendChild(inner)
-    wrapper.appendChild(div)
-  },
-
   updateImage: function () {
     // if (!imageToDisplay) {
     //   if (!this.imageSource || !this.imageSource.length) {
@@ -321,20 +263,7 @@ Module.register('mmm-amazon-photos', {
       if (that.imagesDiv.childNodes.length > 0) {
         that.imagesDiv.childNodes[0].style.opacity = '0'
       }
-
-      const transitionDiv = document.createElement('div')
-      transitionDiv.className = 'transition'
-      let randomNumber = Math.floor(
-        Math.random() * that.config.transitions.length
-      )
-      if (that.config.transitionImages && that.config.transitions.length > 0) {
-        transitionDiv.style.animationDuration = that.config.transitionSpeed
-        transitionDiv.style.transition = `opacity ${that.config.transitionSpeed} ease-in-out`
-        transitionDiv.style.animationName =
-          that.config.transitions[randomNumber]
-        transitionDiv.style.animationTimingFunction =
-          that.config.transitionTimingFunction
-      }
+      const containerDiv = document.createElement('div')
 
       const imageDiv = that.createDiv()
       imageDiv.style.backgroundImage = `url("${image.src}")`
@@ -342,52 +271,6 @@ Module.register('mmm-amazon-photos', {
 
       // this.div1.style.backgroundImage = `url("${image.src}")`;
       // this.div1.style.opacity = '1';
-
-      if (that.config.showProgressBar) {
-        // Restart css animation
-        const oldDiv = document.getElementsByClassName('progress-inner')[0]
-        const newDiv = oldDiv.cloneNode(true)
-        oldDiv.parentNode.replaceChild(newDiv, oldDiv)
-        newDiv.style.display = ''
-      }
-
-      // Check to see if we need to animate the background
-      if (
-        that.config.backgroundAnimationEnabled &&
-        that.config.animations.length
-      ) {
-        randomNumber = Math.floor(Math.random() * that.config.animations.length)
-        const animation = that.config.animations[randomNumber]
-        imageDiv.style.animationDuration =
-          that.config.backgroundAnimationDuration
-        imageDiv.style.animationDelay = that.config.transitionSpeed
-
-        if (animation === 'slide') {
-          // check to see if the width of the picture is larger or the height
-          var width = image.width
-          var height = image.height
-          var adjustedWidth = (width * window.innerHeight) / height
-          var adjustedHeight = (height * window.innerWidth) / width
-
-          imageDiv.style.backgroundPosition = ''
-          imageDiv.style.animationIterationCount =
-            that.config.backgroundAnimationLoopCount
-          imageDiv.style.backgroundSize = 'cover'
-
-          if (
-            adjustedWidth / window.innerWidth >
-            adjustedHeight / window.innerHeight
-          ) {
-            // Scrolling horizontally...
-            imageDiv.className += ' slideH'
-          } else {
-            // Scrolling vertically...
-            imageDiv.className += ' slideV'
-          }
-        } else {
-          imageDiv.className += ` ${animation}`
-        }
-      }
 
       // EXIF.getData(image, () => {
       //   if (this.config.showImageInfo) {
@@ -417,8 +300,8 @@ Module.register('mmm-amazon-photos', {
       //   imageDiv.style.transform = this.getImageTransformCss(exifOrientation);
       // }
       // });
-      transitionDiv.appendChild(imageDiv)
-      that.imagesDiv.appendChild(transitionDiv)
+      containerDiv.appendChild(imageDiv)
+      that.imagesDiv.appendChild(containerDiv)
     }
     console.info(`this.imageSource ${this.imageSource}`)
     image.src = encodeURI(this.imageSource)
