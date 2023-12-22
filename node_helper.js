@@ -29,7 +29,7 @@ module.exports = NodeHelper.create({
     const imageUrl =
       config.imagePaths[Math.floor(Math.random() * config.imagePaths.length)]
     const shareId = imageUrl.split('share/')[1]
-    const path = Path.resolve(__dirname, 'images', 'code.jpg')
+    const path = Path.resolve(__dirname, 'images', 'photo.jpg')
     const jsonPath = Path.resolve(__dirname, 'images', 'cache.json')
     let returnPayload
 
@@ -90,14 +90,14 @@ module.exports = NodeHelper.create({
       // build the return payload
       returnPayload = {
         identifier: config.identifier,
-        imageSource: `modules/mmm-amazon-photos/images/code.jpg?shareId=${shareId}&offset=${cachedNextTokens[shareId]}`,
+        imageSource: `modules/mmm-amazon-photos/images/photo.jpg?shareId=${shareId}&offset=${cachedNextTokens[shareId]}`,
       }
     } catch (err) {
       console.error(err)
       // in case of an error, return the already downloaded image and try again in the next iteration
       returnPayload = {
         identifier: config.identifier,
-        imageSource: 'modules/mmm-amazon-photos/images/code.jpg',
+        imageSource: 'modules/mmm-amazon-photos/images/photo.jpg',
       }
     }
     // send the image list back
@@ -128,7 +128,9 @@ module.exports = NodeHelper.create({
       const config = payload
 
       try {
-        const stats = Fs.statSync(Path.resolve(__dirname, 'images', 'code.jpg'))
+        const stats = Fs.statSync(
+          Path.resolve(__dirname, 'images', 'photo.jpg')
+        )
         console.log(
           `Now: ${Date.now()}, mtime: ${new Date(
             stats.mtime
@@ -147,7 +149,7 @@ module.exports = NodeHelper.create({
           console.info('Return cached image')
           const returnPayload = {
             identifier: config.identifier,
-            imageSource: `modules/mmm-amazon-photos/images/code.jpg?cached=true`,
+            imageSource: `modules/mmm-amazon-photos/images/photo.jpg?cached=true`,
           }
           // send the image list back
           this.sendSocketNotification('AMAZONPHOTOS_FILELIST', returnPayload)
