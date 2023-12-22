@@ -161,6 +161,15 @@ module.exports = NodeHelper.create({
         console.error(err)
       }
 
+      // prevent black screen when image exists locally
+      // TODO: avoid code duplication
+      const returnPayload = {
+        identifier: config.identifier,
+        imageSource: `modules/mmm-amazon-photos/images/photo.jpg?cached=true`,
+      }
+      // send the image list back
+      this.sendSocketNotification('AMAZONPHOTOS_FILELIST', returnPayload)
+
       // Get the image list in a non-blocking way since large # of images would cause
       // the MagicMirror startup banner to get stuck sometimes.
       setTimeout(async () => {
