@@ -14,7 +14,7 @@
  */
 
 // call in the required classes
-var NodeHelper = require('node_helper')
+const NodeHelper = require('node_helper')
 const Fs = require('fs')
 const Path = require('path')
 const { default: Axios } = require('axios')
@@ -111,7 +111,7 @@ module.exports = NodeHelper.create({
     const writer = Fs.createWriteStream(path)
 
     const response = await Axios({
-      url: `${url}?viewBox=3840%2C2160`,
+      url: `${url}?download=true`,
       method: 'GET',
       responseType: 'stream',
     })

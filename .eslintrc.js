@@ -9,9 +9,14 @@ module.exports = {
   extends: ['eslint:recommended', 'prettier'],
   globals: {
     Log: true,
+    EXIF: true,
   },
   parserOptions: {
     ecmaVersion: 'latest',
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
   rules: {},
 }

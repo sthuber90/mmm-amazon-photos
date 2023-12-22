@@ -7,27 +7,27 @@ let config = {
   timeFormat: 24,
   units: 'metric',
   modules: [
-    // {
-    //   module: 'clock',
-    //   position: 'top_right',
-    // },
-    // {
-    //   module: 'calendar',
-    //   header: 'US Holidays',
-    //   position: 'bottom_right',
-    //   config: {
-    //     calendars: [
-    //       {
-    //         symbol: 'calendar-check',
-    //         url: 'webcal://www.calendarlabs.com/ical-calendar/ics/76/US_Holidays.ics',
-    //       },
-    //     ],
-    //   },
-    // },
-    // {
-    //   module: 'compliments',
-    //   position: 'bottom_center',
-    // },
+    {
+      module: 'clock',
+      position: 'top_right',
+    },
+    {
+      module: 'calendar',
+      header: 'US Holidays',
+      position: 'bottom_right',
+      config: {
+        calendars: [
+          {
+            symbol: 'calendar-check',
+            url: 'webcal://www.calendarlabs.com/ical-calendar/ics/76/US_Holidays.ics',
+          },
+        ],
+      },
+    },
+    {
+      module: 'compliments',
+      position: 'middle_center',
+    },
     {
       module: 'mmm-amazon-photos',
       position: 'fullscreen_below',

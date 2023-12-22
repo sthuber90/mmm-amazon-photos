@@ -8,7 +8,7 @@
  * Magic Mirror By Michael Teeuw http://michaelteeuw.nl
  * MIT Licensed.
  *
- * Module MMM-Slideshow By Darick Carpenter
+ * Module MMM-Slideshow By Darick Carpenter https://github.com/darickc/MMM-BackgroundSlideshow/tree/master
  * MIT Licensed.
  */
 
@@ -33,7 +33,7 @@ Module.register('mmm-amazon-photos', {
     // list of valid file extensions, separated by commas
     validImageFileExtensions: 'bmp,jpg,jpeg,gif,png',
     // show a panel containing information about the image currently displayed.
-    showImageInfo: false,
+    showImageInfo: true,
     // a comma separated list of values to display: name, date, geo (TODO)
     imageInfo: 'name, date, imagecount',
     // location of the info div
@@ -101,12 +101,7 @@ Module.register('mmm-amazon-photos', {
   },
 
   getScripts: function () {
-    return [
-      /* 'modules/' + this.name + '/node_modules/exif-js/exif.js', */ 'modules/' +
-        this.name +
-        '/node_modules/lodash/lodash.js',
-      'moment.js',
-    ]
+    return [this.file('node_modules/exif-js/exif.js'), 'moment.js']
   },
 
   getStyles: function () {
@@ -162,7 +157,7 @@ Module.register('mmm-amazon-photos', {
 
   // Override dom generator.
   getDom: function () {
-    var wrapper = document.createElement('div')
+    const wrapper = document.createElement('div')
     this.imagesDiv = document.createElement('div')
     this.imagesDiv.className = 'images'
     wrapper.appendChild(this.imagesDiv)
@@ -195,35 +190,44 @@ Module.register('mmm-amazon-photos', {
       this.updateImageList()
     }
 
+    this.config.focus
+      ? window.addEventListener('click', function () {
+          Array.from(document.getElementsByClassName('container')).forEach(
+            function (elem) {
+              if (
+                !elem.innerHTML.includes('mmm-amazon-photos') &&
+                elem.innerHTML !== ''
+              ) {
+                if (elem.style.display === 'none') {
+                  elem.style.display = 'block'
+                } else {
+                  elem.style.display = 'none'
+                }
+              }
+            }
+          )
+        })
+      : undefined
+
+    // const that = this
+    // this.config.focus
+    //   ? window.addEventListener('dblclick', function () {
+    //       that.imageInfoDiv.style.display = 'block'
+    //     })
+    //   : undefined
     return wrapper
   },
 
   createGradientDiv: function (direction, gradient, wrapper) {
-    var div = document.createElement('div')
+    const div = document.createElement('div')
     div.style.backgroundImage =
       'linear-gradient( to ' + direction + ', ' + gradient.join() + ')'
     div.className = 'gradient'
-    this.config.focus
-      ? div.addEventListener('click', function () {
-          document.getElementsByClassName('container').forEach(function (elem) {
-            if (
-              !elem.innerHTML.includes('mmm-amazon-photos') &&
-              elem.innerHTML !== ''
-            ) {
-              if (elem.style.display === 'none') {
-                elem.style.display = 'block'
-              } else {
-                elem.style.display = 'none'
-              }
-            }
-          })
-        })
-      : undefined
     wrapper.appendChild(div)
   },
 
   createDiv: function () {
-    var div = document.createElement('div')
+    const div = document.createElement('div')
     div.style.backgroundSize = this.config.backgroundSize
     div.style.backgroundPosition = this.config.backgroundPosition
     div.className = 'image'
@@ -238,68 +242,56 @@ Module.register('mmm-amazon-photos', {
   },
 
   updateImage: function () {
-    // if (!imageToDisplay) {
-    //   if (!this.imageSource || !this.imageSource.length) {
-    //     return;
+    // // get greatest common denominator
+    // const gcd = (a, b) => {
+    //   // Since there is a limited precision we need to limit the value.
+    //   if (b < 0.0000001) return a
+
+    //   // Discard any fractions due to limitations in precision.
+    //   return gcd(b, Math.floor(a % b))
+    // }
+    // const getFraction = (exposureTime) => {
+    //   if (exposureTime) {
+    //     var len = exposureTime.toString().length - 2
+
+    //     var denominator = Math.pow(10, len)
+    //     var numerator = exposureTime * denominator
+
+    //     var divisor = gcd(numerator, denominator)
+
+    //     numerator /= divisor
+    //     denominator /= divisor
+
+    //     return `${Math.floor(numerator)}/${Math.floor(denominator)}`
     //   }
 
-    //   if (this.imageIndex >= this.imageSource.length) {
-    //     this.imageIndex = 0;
-    //     // only update the image list if one wasn't sent through notifications
-    //     if (!this.savedImages) {
-    //       this.updateImageList();
-    //       return;
-    //     }
-    //   }
+    //   return null
     // }
 
     const image = new Image()
     const that = this
     image.onload = function () {
-      // check if there are more than 2 elements and remove the first one
-      if (that.imagesDiv.childNodes.length > 1) {
-        that.imagesDiv.removeChild(that.imagesDiv.childNodes[0])
-      }
-      if (that.imagesDiv.childNodes.length > 0) {
-        that.imagesDiv.childNodes[0].style.opacity = '0'
-      }
+      // remove old image divs
+      that.imagesDiv.childNodes.forEach((_, idx) =>
+        that.imagesDiv.removeChild(that.imagesDiv.childNodes[idx])
+      )
       const containerDiv = document.createElement('div')
 
       const imageDiv = that.createDiv()
       imageDiv.style.backgroundImage = `url("${image.src}")`
-      // imageDiv.style.transform = 'rotate(0deg)';
 
-      // this.div1.style.backgroundImage = `url("${image.src}")`;
-      // this.div1.style.opacity = '1';
+      EXIF.getData(image, () => {
+        // // const allMetaData = EXIF.getAllTags(this)
+        // // console.log(JSON.stringify(allMetaData, null, '\t'))
+        // const model = EXIF.getTag(this, 'Model')
+        // const aperture = EXIF.getTag(this, 'FNumber')
+        // const focalLength = EXIF.getTag(this, 'FocalLength')
+        // const exposureTime = getFraction(EXIF.getTag(this, 'ExposureTime'))
+        // let lat = EXIF.getTag(this, "GPSLatitude");
+        //   let lon = EXIF.getTag(this, "GPSLongitude");
+        //     this.updateImageInfo(decodeURI(image.src), dateTime);
+      })
 
-      // EXIF.getData(image, () => {
-      //   if (this.config.showImageInfo) {
-      //     let dateTime = EXIF.getTag(image, 'DateTimeOriginal');
-      //     // attempt to parse the date if possible
-      //     if (dateTime !== null) {
-      //       try {
-      //         dateTime = moment(dateTime, 'YYYY:MM:DD HH:mm:ss');
-      //         dateTime = dateTime.format('dddd MMMM D, YYYY HH:mm');
-      //       } catch (e) {
-      //         console.log('Failed to parse dateTime: ' + dateTime + ' to format YYYY:MM:DD HH:mm:ss');
-      //         dateTime = '';
-      //       }
-      //     }
-      //     // TODO: allow for location lookup via openMaps
-      //     // let lat = EXIF.getTag(this, "GPSLatitude");
-      //     // let lon = EXIF.getTag(this, "GPSLongitude");
-      //     // // Only display the location if we have both longitute and lattitude
-      //     // if (lat && lon) {
-      //     //   // Get small map of location
-      //     // }
-      //     this.updateImageInfo(decodeURI(image.src), dateTime);
-      //   }
-
-      // if (!this.browserSupportsExifOrientationNatively) {
-      //   const exifOrientation = EXIF.getTag(image, 'Orientation');
-      //   imageDiv.style.transform = this.getImageTransformCss(exifOrientation);
-      // }
-      // });
       containerDiv.appendChild(imageDiv)
       that.imagesDiv.appendChild(containerDiv)
     }
@@ -310,28 +302,6 @@ Module.register('mmm-amazon-photos', {
     this.sendNotification('AMAZONPHOTOS_IMAGE_UPDATED', { url: image.src })
     console.info('Updating image, source:' + image.src)
   },
-
-  // getImageTransformCss: function (exifOrientation) {
-  //   switch (exifOrientation) {
-  //     case 2:
-  //       return 'scaleX(-1)';
-  //     case 3:
-  //       return 'scaleX(-1) scaleY(-1)';
-  //     case 4:
-  //       return 'scaleY(-1)';
-  //     case 5:
-  //       return 'scaleX(-1) rotate(90deg)';
-  //     case 6:
-  //       return 'rotate(90deg)';
-  //     case 7:
-  //       return 'scaleX(-1) rotate(-90deg)';
-  //     case 8:
-  //       return 'rotate(-90deg)';
-  //     case 1: // Falls through.
-  //     default:
-  //       return 'rotate(0deg)';
-  //   }
-  // },
 
   updateImageInfo: function (imageSrc, imageDate) {
     let imageProps = []
@@ -391,7 +361,7 @@ Module.register('mmm-amazon-photos', {
   resume: function () {
     //this.updateImage(); //Removed to prevent image change whenever MMM-Carousel changes slides
     this.suspend()
-    var self = this
+    const self = this
     this.timer = setInterval(function () {
       console.info('mmm-amazon-photos updating from resume')
       self.updateImageList()

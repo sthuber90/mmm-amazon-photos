@@ -17,7 +17,8 @@
   "author": "sthuber90",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.25.0"
+    "axios": "^0.25.0",
+    "exif-js": "^2.3.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.3",
