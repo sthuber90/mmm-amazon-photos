@@ -206,6 +206,15 @@ Module.register('mmm-amazon-photos', {
               }
             }
           )
+
+          const gradient = Array.from(
+            document.getElementsByClassName('gradient')
+          )[0]
+          if (gradient.style.display === 'none') {
+            gradient.style.display = 'block'
+          } else {
+            gradient.style.display = 'none'
+          }
         })
       : undefined
 
