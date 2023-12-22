@@ -33,7 +33,7 @@ let config = {
       position: 'fullscreen_below',
       config: {
         imageUrls: [
-          'https://www.amazon.de/photos/share/m0qXS7AVB49zDMqTP6XPklJ6ZPpN1TG5plMhRFWMKc5',
+          'https://www.amazon.de/photos/share/gb5qG05BNuDH5P3R139RM3OvwUdCeseRAk4UXPR69O7',
         ],
         slideshowSpeed: 5000,
       },
