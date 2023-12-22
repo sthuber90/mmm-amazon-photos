@@ -26,9 +26,11 @@ module.exports = NodeHelper.create({
 
   // gathers the image list
   gatherImageList: async function (config) {
-    const imageUrl =
+    const imageUrl = new URL(
       config.imagePaths[Math.floor(Math.random() * config.imagePaths.length)]
-    const shareId = imageUrl.split('share/')[1]
+    )
+    const origin = imageUrl.origin
+    const shareId = imageUrl.pathname.split('share/')[1]
     const path = Path.resolve(__dirname, 'images', 'photo.jpg')
     const jsonPath = Path.resolve(__dirname, 'images', 'cache.json')
     let returnPayload
@@ -40,19 +42,19 @@ module.exports = NodeHelper.create({
         : {}
 
       const res = await Axios.get(
-        `https://www.amazon.de/drive/v1/shares/${shareId}?shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
+        `${origin}/drive/v1/shares/${shareId}?shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
       )
       console.log(`Get picture from ${res.data.nodeInfo.name}`)
       const intermediateRes = await Axios.get(
-        `https://www.amazon.de/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&tempLink=true&shareId=${shareId}&offset=0&resourceVersion=V2&ContentType=JSON`
+        `${origin}/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&tempLink=true&shareId=${shareId}&offset=0&resourceVersion=V2&ContentType=JSON`
       )
 
-      let url = `https://www.amazon.de/drive/v1/nodes/${intermediateRes.data.data[0].id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
+      let url = `${origin}/drive/v1/nodes/${intermediateRes.data.data[0].id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
       if (
         'kind' in intermediateRes.data.data[0] &&
         intermediateRes.data.data[0].kind === 'FILE'
       ) {
-        url = `https://www.amazon.de/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
+        url = `${origin}/drive/v1/nodes/${res.data.nodeInfo.id}/children?asset=ALL&limit=1&searchOnFamily=false&sort=%5B%27contentProperties.contentDate+ASC%27%5D&tempLink=true&shareId=${shareId}&resourceVersion=V2&ContentType=JSON`
       }
       if (Object.prototype.hasOwnProperty.call(cachedNextTokens, shareId)) {
         url = url.concat(`&offset=${cachedNextTokens[shareId]}`)

@@ -19,7 +19,7 @@ Module.register('mmm-amazon-photos', {
     // works only together with the gradient
     focus: true,
     // an array of strings, each is a path to a directory with images
-    imagePaths: ['modules/mmm-amazon-photos/exampleImages'],
+    imageUrl: ['modules/mmm-amazon-photos/exampleImages'],
     // the speed at which to switch between images, in milliseconds
     slideshowSpeed: 10 * 1000,
     // if true randomize image order, otherwise use sortImagesBy and sortImagesDescending
@@ -232,8 +232,8 @@ Module.register('mmm-amazon-photos', {
       this.createProgressbarDiv(wrapper, this.config.slideshowSpeed)
     }
 
-    if (this.config.imagePaths.length == 0) {
-      // Log.error('mmm-amazon-photos: Missing required parameter imagePaths.');
+    if (this.config.imageUrl.length == 0) {
+      // Log.error('mmm-amazon-photos: Missing required parameter imageUrl.');
     } else {
       // create image source and load cached image if it exists
       this.imageSource = `${location.origin}/modules/mmm-amazon-photos/images/photo.jpg`
@@ -465,7 +465,7 @@ Module.register('mmm-amazon-photos', {
         case 'name': // default is name
           // Otherwise display path relative to the path in configuration.
           if (this.config.recursiveSubDirectories) {
-            for (const path of this.config.imagePaths) {
+            for (const path of this.config.imageUrl) {
               if (!imageSrc.includes(path)) {
                 continue
               }
