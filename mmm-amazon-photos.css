@@ -10,3 +10,23 @@
 .mmm-amazon-photos .image {
   background-repeat: no-repeat;
 }
+
+.mmm-amazon-photos .info {
+  bottom: 2rem;
+  right: 2rem;
+  display: none;
+  padding: 15px;
+  font-size: var(--font-size);
+  line-height: 25px;
+  position: absolute;
+  grid-template-columns: auto auto;
+  gap: 0px 10px;
+}
+
+.mmm-amazon-photos .info .icon {
+  display: inline-block;
+  line-height: 25px;
+  height: var(--font-size);
+  width: var(--font-size);
+  vertical-align: baseline;
+}
